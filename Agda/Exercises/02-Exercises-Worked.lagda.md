@@ -174,7 +174,10 @@ You can actually prove this much easier! How?
 Finish our characterisation of `_≡_` by proving
 ```agda
 bool-≡-char₂ : ∀ (b b' : Bool) → (bool-as-type b ⇔ bool-as-type b') → b ≡ b'
-bool-≡-char₂ = {!!}
+bool-≡-char₂ true true eq = refl true
+bool-≡-char₂ true false eq = 𝟘-elim (pr₁ eq ⋆)
+bool-≡-char₂ false true eq = 𝟘-elim (pr₂ eq ⋆)
+bool-≡-char₂ false false eq = refl false
 ```
 
 
@@ -187,7 +190,39 @@ has-bool-dec-fct A = Σ f ꞉ (A → A → Bool) , (∀ x y → x ≡ y ⇔ (f x
 ```
 Prove that
 ```agda
+d0 : {A : Type} → {x y : A} → x ≡ y → A
+d0 {A} {x} {y} p = x
+
+d1 : {A : Type} → {x y : A} → x ≡ y → A
+d1 {A} {x} {y} p = y
+
+decide : {A : Type} → A ∔ ¬ A → Bool
+decide (inl _) = true
+decide (inr _) = false
+
+diagrefl : {A : Type} → {d : has-decidable-equality A} → {x : A} → decide (d x x) ≡ true
+diagrefl {A} {d} {x} = {! !}
+
 decidable-equality-char : (A : Type) → has-decidable-equality A ⇔ has-bool-dec-fct A
-decidable-equality-char = {!!}
+pr₁ (decidable-equality-char A) deceq =
+ (λ a a' → decide (deceq a a')) , -- takes an inhabitant of a ≡ a' to true and an inhabitant of the negation to false
+  (λ a a' → ({!(ap (λ x → decide (deceq x a')))!} , {!!}))
+
+
+pr₂ (decidable-equality-char A)  x₁ y = {!   !}
+
+
 ```
+A personal exercise: show that 𝟘 is a (right) identity (up to equivalence) for ∔,
+i.e. that A ∔ 𝟘 is equivalent to A.
+```agda
+𝟘-right-identity : {A : Type} → ((A ∔ 𝟘) ⇔ A)
+pr₁ 𝟘-right-identity (inl x) = x
+pr₂ 𝟘-right-identity x = inl x
+
+𝟘-left-identity : {A : Type} → ((𝟘 ∔ A) ⇔ A)
+pr₁ 𝟘-left-identity (inr x) = x
+pr₂ 𝟘-left-identity x = inr x
+```
+
  
