@@ -142,19 +142,19 @@ has-bool-dec-fct A = Σ f ꞉ (A → A → Bool) , (∀ x y → x ≡ y ⇔ (f x
 decidable-equality-char : (A : Type) → has-decidable-equality A ⇔ has-bool-dec-fct A
 pr₁ (decidable-equality-char A) discA = f , f-dec -- left to right implication
   where
-  f' : (a b : A) → is-decidable (a ≡ b) → Bool
-  f' a b (inl _) = true
-  f' a b (inr _) = false
+  decide : {B : Type} → is-decidable B → Bool
+  decide (inl _) = true
+  decide (inr _) = false
 
-  f'-refl : (x : A) (d : is-decidable (x ≡ x)) → f' x x d ≡ true
-  f'-refl x (inl _) = refl true
-  f'-refl x (inr x≢x) = 𝟘-nondep-elim (x≢x (refl x))
+  decide-refl : (x : A) (d : is-decidable (x ≡ x)) → decide d ≡ true
+  decide-refl x (inl _) = refl true
+  decide-refl x (inr x≢x) = 𝟘-nondep-elim (x≢x (refl x))
 
   f : A → A → Bool
-  f a b = f' a b (discA a b)
+  f a b = decide (discA a b)
 
   f-dec : ∀ x y → x ≡ y ⇔ (f x y) ≡ true
-  pr₁ (f-dec x .x) (refl .x) = f'-refl x (discA x x)
+  pr₁ (f-dec x .x) (refl .x) = decide-refl x (discA x x)
   pr₂ (f-dec x y) with discA x y
   ... | (inl p) = λ _ → p
   ... | (inr _) = λ q → 𝟘-nondep-elim (true≢false (q ⁻¹))
