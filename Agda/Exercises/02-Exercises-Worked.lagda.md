@@ -203,6 +203,10 @@ decide (inr _) = false
 diagrefl : {A : Type} → {d : has-decidable-equality A} → {x : A} → decide (d x x) ≡ true
 diagrefl {A} {d} {x} = {! !}
 
+getrefl : {A : Type} → {a a' : A} → (deceqpt : is-decidable (a ≡ a')) → a ≡ a' → decide (deceqpt) ≡ true
+getrefl (inl _) _ = refl true
+getrefl (inr a≢a') p = 𝟘-nondep-elim {!!}
+
 decidable-equality-char : (A : Type) → has-decidable-equality A ⇔ has-bool-dec-fct A
 pr₁ (decidable-equality-char A) deceq =
  (λ a a' → decide (deceq a a')) , -- takes an inhabitant of a ≡ a' to true and an inhabitant of the negation to false
