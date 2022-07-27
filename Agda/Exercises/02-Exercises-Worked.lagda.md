@@ -190,28 +190,10 @@ has-bool-dec-fct A = Σ f ꞉ (A → A → Bool) , (∀ x y → x ≡ y ⇔ (f x
 ```
 Prove that
 ```agda
-d0 : {A : Type} → {x y : A} → x ≡ y → A
-d0 {A} {x} {y} p = x
-
-d1 : {A : Type} → {x y : A} → x ≡ y → A
-d1 {A} {x} {y} p = y
-
-∂ : {A : Type} → {x y : A} → x ≡ y → A × A
-∂ {A} {x} {y} p = (x , y)
-
 decide : {A : Type} → A ∔ ¬ A → Bool
 decide (inl _) = true
 decide (inr _) = false
 
-
-{--
-diagrefl : {A : Type} → {d : has-decidable-equality A} → {x : A} → decide (d x x) ≡ true
-diagrefl {A} {d} {x} = --
-
-getrefl : {A : Type} → {a a' : A} → (deceqpt : is-decidable (a ≡ a')) → a ≡ a' → decide (deceqpt) ≡ true
-getrefl (inl _) _ = refl true
-getrefl (inr a≢a') p = 𝟘-nondep-elim --
---}
 -- note that in the following, we can't use deceq : has-decidable-equality A, which would be more natural. This is because we can't case split on it...as far as I can tell? or maybe we just need to apply an appropriate lambda to it...
 ap-bool-≡-y : {A : Type} → {x y : A} → (dec : is-decidable (x ≡ y)) → x ≡ y → decide dec ≡ true
 ap-bool-≡-y (inl _) _ = refl _
@@ -225,9 +207,6 @@ ap-y-≡-bool (inl p) _ = p
 ap-y-≡-bool (inr _) false≡true = 𝟘-nondep-elim (false≢true false≡true)
 
 
-
--- (∀ x y → x ≡ y ⇔ (f x y) ≡ true)
-
 {-- so after all, the technique was: back up to the thing everything is dependent on, and define a
 function that starts with that (and then takes in any other info you need) --}
 
@@ -240,81 +219,8 @@ pr₁ (decidable-equality-char A) deceq =
  (λ a a' → decide (deceq a a')) , -- takes an inhabitant of a ≡ a' to true and an inhabitant of the negation to false
  (λ a a' → (ap-bool-≡-y (deceq a a'),  ap-y-≡-bool (deceq a a')))
 pr₂ (decidable-equality-char A) (eqb , p2b) a a' = decide-via-indicator (eqb a a') (p2b a a')
-{--
-testtt : (yf : Bool) → ((λ y → yf ≡ y) yf)
-testtt yf = if[ λ x → x ≡ yf ] yf then (if yf then (refl _) else (refl _)) else (refl _)
---}
-
-
-{--
-ok so we have to start with refl _ : (f a a') ≡ (f a a').
-Then we have to something that gets us to <something> : true ≡ f a a' in the case where 
-
-if[ λ x → x ≡ yf ] yf then (if yf then refl else ()) else (refl _)
-
-are we trying to use bool ind when we should use path ind? ∶
---}
-{-
-if[_]_then_else_ : (P : Bool → Type) → (x : Bool) → P true → P false → P x
-if[ P ] true then t else f = t
-if[ P ] false then t else f = f
-
-ite : (P : Bool → Type) → (x : Bool) → P true → P false → P x
-ite P true t f = t
-ite P false t f = f
--}
-
-{--
-we need something that simultaneously recognizes the expression f a a' to be true in one branch and inhabits f a a' ≡ true,
-and in the other takes f a a' ≡ false. Can we do that?
-
-
-if[ λ x → x ≡ f a a' ] (f a a') then (refl _) else (refl _)
---}
-
-
-{--
-  
-   λ x → inchoice x
-     if[ λ {true → a ≡ a'; false → ¬ a ≡ a' } ]
-     if (f a a') then inl (pr₂ p2b (refl _)) else inr (pr₁ p2b)
-     
-   λ y → (
-    if[ λ x → (f a a') ≡ x ] (f a a')
-    then (
-
-
-   then (inl (pr₂ (p2b a a') (refl true)))
-   else {!(inr ({!!} ∘ (pr₁ (p2b a a'))))!}
-  
-   basically: use f to get true or false...but how do we get that "inside" the equivalence?
-   one strategy: prove in each context that it is equal to itself and compose paths
-   another: use bool-≡-char₁ to get a map, and map out of true via pr₂ , and let the result sort itself out 
-
-   λ a a' → (pr₁ (p2b a a')
-
-   bool-≡-char₁ (f a a') true 
-
-   bool-as-type (f a a')
-
-   
---}
-{--
-test : (x : Bool) → (p : x ≡ true) → ℕ ∔ 𝟘
-test x = Bool-ind (\ x -> x ≡ true -> ℕ ∔ 𝟘) (\ _ -> inl 1) (\p -> inr (false≢true p)) x
---}
-{-
-test : (x : Bool) → (p : x ≡ true) → ℕ ∔ 𝟘
-test x = (if[ (\ x' -> (x' ≡ true) -> ℕ ∔ 𝟘) ] x then (\ p' -> inl 1) else (λ p' -> inr (false≢true p')))
-
-inchoicetype : Type → Type → Bool → Type
-inchoicetype A B = λ {true → (A → A ∔ B); false → (B → A ∔ B)}
-
-inchoice : {A B : Type} → (x : Bool) → (inchoicetype A B x)
-inchoice {A} {B} x = (if[ inchoicetype A B{--(λ {true → (A → A ∔ B); false → (B → A ∔ B)})--} ] x then inl else inr)
--}
 ```
-A personal exercise: show that 𝟘 is a (right) identity (up to equivalence) for ∔,
+A quick personal exercise: show that 𝟘 is a (right) identity (up to equivalence) for ∔,
 i.e. that A ∔ 𝟘 is equivalent to A.
 ```agda
 𝟘-right-identity : {A : Type} → ((A ∔ 𝟘) ⇔ A)
@@ -324,6 +230,27 @@ pr₂ 𝟘-right-identity x = inl x
 𝟘-left-identity : {A : Type} → ((𝟘 ∔ A) ⇔ A)
 pr₁ 𝟘-left-identity (inr x) = x
 pr₂ 𝟘-left-identity x = inr x
+```
+Some fun little things I didn't use but that feel like they should be standard:
+```agda
+d0 : {A : Type} → {x y : A} → x ≡ y → A
+d0 {A} {x} {y} p = x
+
+d1 : {A : Type} → {x y : A} → x ≡ y → A
+d1 {A} {x} {y} p = y
+
+∂ : {A : Type} → {x y : A} → x ≡ y → A × A
+∂ {A} {x} {y} p = (x , y)
+
+if[_]_then_else_ : (P : Bool → Type) → (x : Bool) → P true → P false → P x
+if[ P ] true then t else f = t
+if[ P ] false then t else f = f
+
+inchoicetype : Type → Type → Bool → Type
+inchoicetype A B = λ {true → (A → A ∔ B); false → (B → A ∔ B)}
+
+inchoice : {A B : Type} → (x : Bool) → (inchoicetype A B x)
+inchoice {A} {B} x = (if[ inchoicetype A B{--(λ {true → (A → A ∔ B); false → (B → A ∔ B)})--} ] x then inl else inr)
 ```
 
  
