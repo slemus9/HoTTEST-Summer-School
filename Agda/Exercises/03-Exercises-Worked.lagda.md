@@ -81,6 +81,11 @@ open _≅_ public
 
 infix 0 _≅_
 ```
+*At one point, I thought I needed the following for something:*
+```agda
+≅-refl : (A : Type) → A ≅ A
+≅-refl A = record { bijection = id ; bijectivity = record { inverse = id ; η = ∼-refl id ; ε = ∼-refl id } }
+```
 
 ### Exercise 2 (⋆)
 
