@@ -203,8 +203,7 @@ decide : {A : Type} → A ∔ ¬ A → Bool
 decide (inl _) = true
 decide (inr _) = false
 
-dothething : {A : Type} (expr : Bool) → (expr ≡ true → A) → is-decidable A
-dothething expr = {!!}
+
 {--
 diagrefl : {A : Type} → {d : has-decidable-equality A} → {x : A} → decide (d x x) ≡ true
 diagrefl {A} {d} {x} = --
@@ -225,28 +224,22 @@ ap-y-≡-bool : {A : Type} → {x y : A} → (dec : is-decidable (x ≡ y)) → 
 ap-y-≡-bool (inl p) _ = p 
 ap-y-≡-bool (inr _) false≡true = 𝟘-nondep-elim (false≢true false≡true)
 
-if[_]_then_else_ : (P : Bool → Type) → (x : Bool) → P true → P false → P x
-if[ P ] true then t else f = t
-if[ P ] false then t else f = f
 
-ite : (P : Bool → Type) → (x : Bool) → P true → P false → P x
-ite P true t f = t
-ite P false t f = f
 
 -- (∀ x y → x ≡ y ⇔ (f x y) ≡ true)
 
-testt : (x : Bool) → ((λ y → x ≡ y) x)
-testt true = refl true
-testt false = refl false
+{-- so after all, the technique was: back up to the thing everything is dependent on, and define a
+function that starts with that (and then takes in any other info you need) --}
+
+decide-via-indicator : {A : Type} (expr : Bool) → (A ⇔ expr ≡ true) → is-decidable A
+decide-via-indicator true  (_ , f) = inl (f (refl true))
+decide-via-indicator false (f , _) = inr (false≢true ∘ f)
 
 decidable-equality-char : (A : Type) → has-decidable-equality A ⇔ has-bool-dec-fct A
 pr₁ (decidable-equality-char A) deceq =
  (λ a a' → decide (deceq a a')) , -- takes an inhabitant of a ≡ a' to true and an inhabitant of the negation to false
  (λ a a' → (ap-bool-≡-y (deceq a a'),  ap-y-≡-bool (deceq a a')))
-pr₂ (decidable-equality-char A) (f , p2b) a a' =
- if (f a a')
- then (inl (pr₂ (p2b a a') ({!!} (f a a'))))
- else (inr ({!!} ∘ (pr₁ (p2b a a'))))
+pr₂ (decidable-equality-char A) (eqb , p2b) a a' = decide-via-indicator (eqb a a') (p2b a a')
 {--
 testtt : (yf : Bool) → ((λ y → yf ≡ y) yf)
 testtt yf = if[ λ x → x ≡ yf ] yf then (if yf then (refl _) else (refl _)) else (refl _)
@@ -261,7 +254,15 @@ if[ λ x → x ≡ yf ] yf then (if yf then refl else ()) else (refl _)
 
 are we trying to use bool ind when we should use path ind? ∶
 --}
+{-
+if[_]_then_else_ : (P : Bool → Type) → (x : Bool) → P true → P false → P x
+if[ P ] true then t else f = t
+if[ P ] false then t else f = f
 
+ite : (P : Bool → Type) → (x : Bool) → P true → P false → P x
+ite P true t f = t
+ite P false t f = f
+-}
 
 {--
 we need something that simultaneously recognizes the expression f a a' to be true in one branch and inhabits f a a' ≡ true,
@@ -302,6 +303,7 @@ if[ λ x → x ≡ f a a' ] (f a a') then (refl _) else (refl _)
 test : (x : Bool) → (p : x ≡ true) → ℕ ∔ 𝟘
 test x = Bool-ind (\ x -> x ≡ true -> ℕ ∔ 𝟘) (\ _ -> inl 1) (\p -> inr (false≢true p)) x
 --}
+{-
 test : (x : Bool) → (p : x ≡ true) → ℕ ∔ 𝟘
 test x = (if[ (\ x' -> (x' ≡ true) -> ℕ ∔ 𝟘) ] x then (\ p' -> inl 1) else (λ p' -> inr (false≢true p')))
 
@@ -310,6 +312,7 @@ inchoicetype A B = λ {true → (A → A ∔ B); false → (B → A ∔ B)}
 
 inchoice : {A B : Type} → (x : Bool) → (inchoicetype A B x)
 inchoice {A} {B} x = (if[ inchoicetype A B{--(λ {true → (A → A ∔ B); false → (B → A ∔ B)})--} ] x then inl else inr)
+-}
 ```
 A personal exercise: show that 𝟘 is a (right) identity (up to equivalence) for ∔,
 i.e. that A ∔ 𝟘 is equivalent to A.
