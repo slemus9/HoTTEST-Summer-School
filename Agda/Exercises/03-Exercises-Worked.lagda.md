@@ -293,7 +293,7 @@ In order to make the proof more readable, we first prove two lemmas.
 What is the statement of `is-minimal-element-suc`
 under the Curry-Howard interpretation?
 
-Answer: it says that given a subset of ℕ (i.e. a decidable type family P), then for all natural numbers m, if m + 1 is in the subset and if m is a lower bound for the shifted-down type family--and if 0 is not in the subset--then m + 1 is a lower bound for P. In other words, if your successor is in the subset and you're a lower bound for the shifted-down-by-one subset, then your successor is a lower bound for the subset (and therefore implicitly a minimal element)--as long as we didn't throw out an element of the subset when shifting it down by one.
+Answer: it says that given a subset of $mathbb{N}$ (i.e. a decidable type family `P`), then for all natural numbers $m$, if $m + 1$ is in the subset and if $m$ is a lower bound for the shifted-down type family—and if $0$ is not in the subset—then $m + 1$ is a lower bound for P. In other words, if your successor is in the subset and you're a lower bound for the shifted-down-by-one subset, then your successor is a lower bound for the subset (and therefore implicitly a minimal element)--as long as we didn't throw out an element of the subset when shifting it down by one.
 
 Prove this lemma.
 
@@ -311,13 +311,13 @@ is-minimal-element-suc' P d (suc m) pm is-lower-bound-m neg-p0 (suc n) p = is-lo
 But you get the sense that this isn't really what's going on. After all, we seem to be doing a very basic
 operation: shifting and gluing. Can we reflect that in our proof somehow?
 
-To start with: a special case of ℕ-elim where we're just gluing data together into a function:
+To start with: a special case of `ℕ-elim` where we're just gluing data together into a function:
 ```agda
 glue-ℕ : (Q : ℕ → Type) → (Q 0) → ((n' : ℕ) → Q (suc n')) → (n : ℕ) → Q n
 glue-ℕ Q q0 qsuc zero = q0
 glue-ℕ Q q0 qsuc (suc n) = qsuc n
 ```
-Whenever our two-argument type family H (which is meant to represent _≤₁_) satisfies a certain diagonal condition, we can glue certain data together.
+Whenever our two-argument type family H (which is meant to represent `_≤₁_`) satisfies a certain diagonal condition, we can glue certain data together.
 
 This is what's going on "in general" with the is-minimal-element-suc proof.
 ```agda
@@ -332,8 +332,8 @@ glue-diagonal-suc :
 glue-diagonal-suc H diagH P m phzero shift =
  glue-ℕ (λ n → P n → H (suc m) n) phzero (λ n' → λ psuc → (diagH m n') (shift n' psuc))
 ```
-The trick to applying this here is to recognize that ¬ (P 0) is the same as P 0 → (suc m) ≤₁ 0, so
-neg-p0 furnishes our 0 case, and that _≤₁_ judgmentally satisfies the diagonal condition, so that we can just use id.
+The trick to applying this here is to recognize that `¬ (P 0)` is the same as `P 0 → (suc m) ≤₁ 0`, so
+`neg-p0` furnishes our `0` case, and that `_≤₁_` judgmentally satisfies the diagonal condition, so that we can just use `id`.
 ```agda
 is-minimal-element-suc :
   (P : ℕ → Type) (d : is-decidable-predicate P)
