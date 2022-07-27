@@ -317,7 +317,7 @@ glue-ℕ : (Q : ℕ → Type) → (Q 0) → ((n' : ℕ) → Q (suc n')) → (n :
 glue-ℕ Q q0 qsuc zero = q0
 glue-ℕ Q q0 qsuc (suc n) = qsuc n
 ```
-Whenever our two-argument type family H (which is meant to represent `_≤₁_`) satisfies a certain diagonal condition, we can glue certain data together.
+Whenever a two-argument type family `H` over the natural numbers (which is meant to represent `_≤₁_`) satisfies a certain diagonal condition, we can glue certain data together.
 
 This is what's going on "in general" with the is-minimal-element-suc proof.
 ```agda
@@ -348,6 +348,9 @@ is-minimal-element-suc P _ m _ is-lower-bound-m neg-p0 =
 
 What is the statement of `well-ordering-principle-suc`
 under the Curry-Howard interpretation?
+
+Answer: Given a subset of $\mathbb{N}$, we can use the minimal element of the shifted-down version of that subset plus whether 0 is in the subset to figure out what the minimal element of the subset is.
+
 Prove this lemma.
 
 ```agda
@@ -356,8 +359,9 @@ well-ordering-principle-suc :
   (n : ℕ) (p : P (suc n)) →
   is-decidable (P 0) →
   minimal-element (λ m → P (suc m)) → minimal-element P
-well-ordering-principle-suc P d n p (inl p0) _  = {!!}
-well-ordering-principle-suc P d n p (inr neg-p0) (m , (pm , is-min-m)) = {!!}
+well-ordering-principle-suc P d n p (inl p0) _  = 0 , (p0 , (λ _ _ → ⋆))
+well-ordering-principle-suc P d n p (inr neg-p0) (m , (pm , is-min-m)) =
+  (suc m) , (pm , is-minimal-element-suc P d m pm is-min-m neg-p0)
 ```
 
 ### Exercise 11 (🌶)
@@ -365,8 +369,9 @@ well-ordering-principle-suc P d n p (inr neg-p0) (m , (pm , is-min-m)) = {!!}
 Use the previous two lemmas to prove the well-ordering principle
 ```agda
 well-ordering-principle : (P : ℕ → Type) → (d : is-decidable-predicate P) → (n : ℕ) → P n → minimal-element P
-well-ordering-principle P d 0 p = {!!}
-well-ordering-principle P d (suc n) p = well-ordering-principle-suc P d n p (d 0) {!!}
+well-ordering-principle P d 0 p = 0 , (p , (λ _ _ → ⋆))
+well-ordering-principle P d (suc n) p =
+  well-ordering-principle-suc P d n p (d 0) (well-ordering-principle (λ x → P (suc x)) (d ∘ suc) n p)
 ```
 
 ### Exercise 12 (🌶)
@@ -379,16 +384,16 @@ is-zero-well-ordering-principle-suc :
   (n : ℕ) (p : P (suc n)) (d0 : is-decidable (P 0)) →
   (x : minimal-element (λ m → P (suc m))) (p0 : P 0) →
   (pr₁ (well-ordering-principle-suc P d n p d0 x)) ≡ 0
-is-zero-well-ordering-principle-suc P d n p (inl p0) x q0 = {!!}
-is-zero-well-ordering-principle-suc P d n p (inr np0) x q0 = {!!}
+is-zero-well-ordering-principle-suc P d n p (inl p0) x q0 = refl _
+is-zero-well-ordering-principle-suc P d n p (inr np0) x q0 = 𝟘-nondep-elim (np0 q0)
 
 is-zero-well-ordering-principle :
   (P : ℕ → Type) (d : is-decidable-predicate P) →
   (n : ℕ) → (pn : P n) →
   P 0 →
   pr₁ (well-ordering-principle P d n pn) ≡ 0
-is-zero-well-ordering-principle P d zero p p0 = {!   !}
+is-zero-well-ordering-principle P d zero p p0 = refl _
 is-zero-well-ordering-principle P d (suc m) pm =
-  is-zero-well-ordering-principle-suc P d m pm (d 0) {!!}
+  is-zero-well-ordering-principle-suc P d m pm (d 0) (well-ordering-principle (λ x → P (suc x)) (d ∘ suc) m pm)
 ```
   
