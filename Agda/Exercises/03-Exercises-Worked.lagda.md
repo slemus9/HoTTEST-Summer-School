@@ -308,8 +308,7 @@ is-minimal-element-suc' P d m pm is-lower-bound-m neg-p0 zero p = neg-p0 p
 is-minimal-element-suc' P d zero pm is-lower-bound-m neg-p0 (suc n) p = ⋆
 is-minimal-element-suc' P d (suc m) pm is-lower-bound-m neg-p0 (suc n) p = is-lower-bound-m n p
 ```
-But you get the sense that this isn't really what's going on. After all, we seem to be doing a very basic
-operation: shifting and gluing. Can we reflect that in our proof somehow?
+But you get the sense that we're relying on the specific nature of `_≤₁_` despite doing something more general. After all, we seem to be doing a very fundamental operation: shifting and gluing. Can we reflect that in our proof somehow?
 
 To start with: a special case of `ℕ-elim` where we're just gluing data together into a function:
 ```agda
@@ -319,11 +318,11 @@ glue-ℕ Q q0 qsuc (suc n) = qsuc n
 ```
 Whenever a two-argument type family `H` over the natural numbers (which is meant to represent `_≤₁_`) satisfies a certain diagonal condition, we can glue certain data together.
 
-This is what's going on "in general" with the is-minimal-element-suc proof.
+This is what's going on "in general" with the `is-minimal-element-suc` proof.
 ```agda
 glue-diagonal-suc :
   (H : ℕ → ℕ → Type)
-  (diagH : ∀ n m → (H n m) → (H (suc n) (suc m)))
+  (diagH : ∀ m n → (H m n) → (H (suc m) (suc n)))
   (P : ℕ → Type)
   (m : ℕ)
   (phzero : (P 0) → (H (suc m) 0)) →
@@ -333,7 +332,7 @@ glue-diagonal-suc H diagH P m phzero shift =
  glue-ℕ (λ n → P n → H (suc m) n) phzero (λ n' → λ psuc → (diagH m n') (shift n' psuc))
 ```
 The trick to applying this here is to recognize that `¬ (P 0)` is the same as `P 0 → (suc m) ≤₁ 0`, so
-`neg-p0` furnishes our `0` case, and that `_≤₁_` judgmentally satisfies the diagonal condition, so that we can just use `id`.
+`neg-p0` furnishes our `0` case, and that `_≤₁_` judgmentally satisfies the diagonal condition, so that we can just use `id` for `diagH`.
 ```agda
 is-minimal-element-suc :
   (P : ℕ → Type) (d : is-decidable-predicate P)
