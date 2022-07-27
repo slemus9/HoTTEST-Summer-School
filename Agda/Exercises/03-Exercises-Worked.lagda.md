@@ -298,28 +298,30 @@ Answer: it says that given a subset of ℕ (i.e. a decidable type family P), the
 Prove this lemma.
 
 ```agda
-is-minimal-element-suc :
+--We could do it like this...
+is-minimal-element-suc' :
   (P : ℕ → Type) (d : is-decidable-predicate P)
   (m : ℕ) (pm : P (suc m))
   (is-lower-bound-m : is-lower-bound (λ x → P (suc x)) m) →
   ¬ (P 0) → is-lower-bound P (suc m)
-is-minimal-element-suc P d m pm is-lower-bound-m neg-p0 zero p = neg-p0 p
-is-minimal-element-suc P d zero pm is-lower-bound-m neg-p0 (suc n) p = ⋆
-is-minimal-element-suc P d (suc m) pm is-lower-bound-m neg-p0 (suc n) p =
-  is-minimal-element-suc P d m {! (d m)  !} {! λ k → (λ {!!} : P (suc k) → m ≤₁ k) !} neg-p0 n {!{!!} : P n !}
+is-minimal-element-suc' P d m pm is-lower-bound-m neg-p0 zero p = neg-p0 p
+is-minimal-element-suc' P d zero pm is-lower-bound-m neg-p0 (suc n) p = ⋆
+is-minimal-element-suc' P d (suc m) pm is-lower-bound-m neg-p0 (suc n) p = is-lower-bound-m n p
+```
+But you get the sense that this isn't really what's going on. After all, we seem to be doing a very basic
+operation: shifting and gluing. Can we reflect that in our proof somehow?
 
-≅-refl : (A : Type) → A ≅ A
-≅-refl A = record { bijection = id ; bijectivity = record { inverse = id ; η = ∼-refl id ; ε = ∼-refl id } }
-{-
-bijection (≅-refl A) = id
-bijectivity (≅-refl A) = -}
-
---A special case of ℕ-elim where we're just gluing data together into a function:
+To start with: a special case of ℕ-elim where we're just gluing data together into a function:
+```agda
 glue-ℕ : (Q : ℕ → Type) → (Q 0) → ((n' : ℕ) → Q (suc n')) → (n : ℕ) → Q n
 glue-ℕ Q q0 qsuc zero = q0
 glue-ℕ Q q0 qsuc (suc n) = qsuc n
+```
+Whenever our two-argument type family H (which is meant to represent _≤₁_) satisfies a certain diagonal condition, we can glue certain data together.
 
-can-shift-and-glue-diag :
+This is what's going on "in general" with the is-minimal-element-suc proof.
+```agda
+glue-diagonal-suc :
   (H : ℕ → ℕ → Type)
   (diagH : ∀ n m → (H n m) → (H (suc n) (suc m)))
   (P : ℕ → Type) --(d : is-decidable-predicate P)
@@ -327,24 +329,19 @@ can-shift-and-glue-diag :
   (phzero : (P 0) → (H (suc m) 0)) →
   (shift : (n : ℕ) → P (suc n) → H m n) →
   (((n' : ℕ) → P n' → H (suc m) n'))
-can-shift-and-glue-diag H diagH P m phzero shift =
+glue-diagonal-suc H diagH P m phzero shift =
  glue-ℕ (λ n → P n → H (suc m) n) phzero (λ n' → λ psuc → (diagH m n') (shift n' psuc))
-{-
-  (n : ℕ) → P (suc n) → H m n === H (suc m) (suc n))
-  ℕ-elim (λ n → (P n → H (suc m) n)) negp0 shift 
--- shift m pm : H m n
--}
-
-{-
- λ { 0       → λ p0 → is-lower-bound-m 
-     (suc n) →
-  }
-  
--}
-{-
-is-minimal-element-suc P d zero = λ pm is-lower-bound-m x m x₁ → {!   !}
-is-minimal-element-suc P d (suc m) = {! is-lower-bound-m  !}
--}
+```
+The trick to applying this here is to recognize that ¬ (P 0) is the same as P 0 → (suc m) ≤₁ 0, so
+neg-p0 furnishes our 0 case, and that _≤₁_ judgmentally satisfies the diagonal condition, so that we can just use id.
+```agda
+is-minimal-element-suc :
+  (P : ℕ → Type) (d : is-decidable-predicate P)
+  (m : ℕ) (pm : P (suc m))
+  (is-lower-bound-m : is-lower-bound (λ x → P (suc x)) m) →
+  ¬ (P 0) → is-lower-bound P (suc m)
+is-minimal-element-suc P _ m _ is-lower-bound-m neg-p0 =
+ glue-diagonal-suc _≤₁_ (λ n m → id) P m neg-p0 is-lower-bound-m
 ```
 
 ### Exercise 10 (🌶)
