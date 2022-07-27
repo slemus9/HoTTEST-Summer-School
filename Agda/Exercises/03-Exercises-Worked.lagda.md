@@ -293,7 +293,7 @@ In order to make the proof more readable, we first prove two lemmas.
 What is the statement of `is-minimal-element-suc`
 under the Curry-Howard interpretation?
 
-Answer: it says that given a subset of $mathbb{N}$ (i.e. a decidable type family `P`), then for all natural numbers $m$, if $m + 1$ is in the subset and if $m$ is a lower bound for the shifted-down type family—and if $0$ is not in the subset—then $m + 1$ is a lower bound for P. In other words, if your successor is in the subset and you're a lower bound for the shifted-down-by-one subset, then your successor is a lower bound for the subset (and therefore implicitly a minimal element)--as long as we didn't throw out an element of the subset when shifting it down by one.
+Answer: it says that given a subset of $\mathbb{N}$ (i.e. a decidable type family `P`), then for all natural numbers $m$, if $m + 1$ is in the subset and if $m$ is a lower bound for the shifted-down type family—and if $0$ is not in the subset—then $m + 1$ is a lower bound for P. In other words, if your successor is in the subset and you're a lower bound for the shifted-down-by-one subset, then your successor is a lower bound for the subset (and therefore implicitly a minimal element)--as long as we didn't throw out an element of the subset when shifting it down by one.
 
 Prove this lemma.
 
