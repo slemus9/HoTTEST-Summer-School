@@ -297,8 +297,8 @@ Answer: it says that given a subset of ℕ (i.e. a decidable type family P), the
 
 Prove this lemma.
 
+We could do it like this...
 ```agda
---We could do it like this...
 is-minimal-element-suc' :
   (P : ℕ → Type) (d : is-decidable-predicate P)
   (m : ℕ) (pm : P (suc m))
@@ -324,11 +324,11 @@ This is what's going on "in general" with the is-minimal-element-suc proof.
 glue-diagonal-suc :
   (H : ℕ → ℕ → Type)
   (diagH : ∀ n m → (H n m) → (H (suc n) (suc m)))
-  (P : ℕ → Type) --(d : is-decidable-predicate P)
-  (m : ℕ) --(pm : P (suc m))
+  (P : ℕ → Type)
+  (m : ℕ)
   (phzero : (P 0) → (H (suc m) 0)) →
   (shift : (n : ℕ) → P (suc n) → H m n) →
-  (((n' : ℕ) → P n' → H (suc m) n'))
+  ((n' : ℕ) → P n' → H (suc m) n')
 glue-diagonal-suc H diagH P m phzero shift =
  glue-ℕ (λ n → P n → H (suc m) n) phzero (λ n' → λ psuc → (diagH m n') (shift n' psuc))
 ```
