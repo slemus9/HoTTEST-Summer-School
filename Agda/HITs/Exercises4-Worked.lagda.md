@@ -126,7 +126,7 @@ compose-pair≡ (refl _) (refl _) (refl _) (refl _) = refl _
 ```
 
 (🌶️)
-```
+```agda
 torus-to-circles : Torus → S1 × S1
 torus-to-circles =
  T-rec
