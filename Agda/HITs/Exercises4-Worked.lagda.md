@@ -20,12 +20,12 @@ homotopy1 : (loop ∙ ! loop) ∙ loop ≡ loop
 homotopy1 = (loop ∙ ! loop) ∙ loop ≡⟨ ! (∙assoc loop (! loop) loop) ⟩
             loop ∙ (! loop ∙ loop) ≡⟨ ap (λ x → loop ∙ x) (!-inv-l loop) ⟩ 
             loop ∙ (refl _)        ≡⟨ ∙unit-r loop ⟩
-            loop ∎
+            loop                   ∎
 
 homotopy2 : (loop ∙ ! loop) ∙ loop ≡ loop
 homotopy2 = (loop ∙ ! loop) ∙ loop ≡⟨ ap (λ x → x ∙ loop) (!-inv-r loop) ⟩
-            (refl _) ∙ loop ≡⟨ ∙unit-l loop ⟩ 
-            loop ∎
+            (refl _) ∙ loop        ≡⟨ ∙unit-l loop ⟩ 
+            loop                   ∎
 ```
 
 (Harder exercise (🌶️): give a path between homotopy1 and
@@ -99,7 +99,8 @@ to-from-loop = (ap (ap from) (S1-rec-loop _ _)) ∙
                (
                 (Circle2-rec-east _ _ _ _) ■
                 ((!-ap _ west) ∙ (ap ! (Circle2-rec-west _ _ _ _))
-                ))
+                )
+              )
 ```
 
 Note: the problems below here are progressively more optional, so if you
