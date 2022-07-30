@@ -88,9 +88,18 @@ to-from-base = refl _
 
 (⋆⋆⋆) 
 
-```
+```agda
+_■_ : {X : Type} {x y z : X} {p0 p1 : x ≡ y} {q0 q1 : y ≡ z}
+      (ηp : p0 ≡ p1) (ηq : q0 ≡ q1) → (p0 ∙ q0) ≡ (p1 ∙ q1)
+(refl _) ■ (refl _) = refl _
+
 to-from-loop : ap from (ap to loop) ≡ loop
-to-from-loop = {!!}
+to-from-loop = (ap (ap from) (S1-rec-loop _ _)) ∙
+               (ap-∙ east (! west)) ∙ 
+               (
+                (Circle2-rec-east _ _ _ _) ■
+                ((!-ap _ west) ∙ (ap ! (Circle2-rec-west _ _ _ _))
+                ))
 ```
 
 Note: the problems below here are progressively more optional, so if you
@@ -178,3 +187,13 @@ p2s : (A : Type) → SuspFromPush A → Susp A
 p2s A = Push-rec (λ { ⋆ → northS }) (λ { ⋆ → southS }) merid
 ```
 
+------
+
+Thought I needed this, but I don't:
+```agda
+ap-∘ : {X Y Z : Type} {x x' : X} (g : Y → Z) (f : X → Y) (p : x ≡ x') →
+       ap g (ap f p) ≡ ap (g ∘ f) p
+ap-∘ g f (refl _) = refl _
+```
+
+ 
