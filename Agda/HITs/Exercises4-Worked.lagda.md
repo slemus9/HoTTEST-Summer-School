@@ -160,7 +160,7 @@ functions as well as types.  Define the action of Susp on functions:
 
 ```agda
 susp-func : {X Y : Type} → (f : X → Y) → Susp X → Susp Y
-susp-func f = Susp-rec northS southS   (merid ∘ f)
+susp-func f = Susp-rec northS southS (merid ∘ f)
 ```
 
 To really prove that Susp is a functor, we should check that this action
