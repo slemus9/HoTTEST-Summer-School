@@ -17,10 +17,15 @@ a path-between-paths-between-paths between the two!
 
 ```agda
 homotopy1 : (loop ∙ ! loop) ∙ loop ≡ loop
-homotopy1 = {!!}
+homotopy1 = (loop ∙ ! loop) ∙ loop ≡⟨ ! (∙assoc loop (! loop) loop) ⟩
+            loop ∙ (! loop ∙ loop) ≡⟨ ap (λ x → loop ∙ x) (!-inv-l loop) ⟩ 
+            loop ∙ (refl _)        ≡⟨ ∙unit-r loop ⟩
+            loop ∎
 
 homotopy2 : (loop ∙ ! loop) ∙ loop ≡ loop
-homotopy2 = {!!}
+homotopy2 = (loop ∙ ! loop) ∙ loop ≡⟨ ap (λ x → x ∙ loop) (!-inv-r loop) ⟩
+            (refl _) ∙ loop ≡⟨ ∙unit-l loop ⟩ 
+            loop ∎
 ```
 
 (Harder exercise (🌶️): give a path between homotopy1 and
@@ -37,14 +42,27 @@ path-between-paths-between-paths = {!!}
 (⋆⋆) State and prove a general lemma about what ap of a function on the
 inverse of a path (! p) does (see ap-∙ for inspiration).  
 
-State and prove a general lemma about what ! (p ∙ q) is.  
+```agda
+!-ap : {X Y : Type} {x x' : X} (f : X → Y) (p : x ≡ x') →
+       (ap f (! p) ≡ ! (ap f p))
+!-ap f (refl _) = refl _ --(ap f (! (refl _)))
+```
+
+State and prove a general lemma about what ! (p ∙ q) is.
+```agda
+!-through-∙ : {X : Type} {x y z : X} (p : x ≡ y) (q : y ≡ z) →
+              (! (p ∙ q) ≡ (! q) ∙ (! p))
+!-through-∙ (p) (refl _) = ! (∙unit-l (! p)) --every other refl computes
+```
 
 Use them to prove that the double function takes loop-inverse to
 loop-inverse concatenated with itself.
 
 ```agda
 double-!loop : ap double (! loop) ≡ ! loop ∙ ! loop
-double-!loop = {!!}
+double-!loop = (!-ap double loop) ∙
+               (ap ! calculate-double-loop) ∙
+               (!-through-∙ loop loop)
 ```
 
 (⋆) Define a function invert : S1 → S1 such that (ap invert) inverts a path
@@ -52,7 +70,7 @@ on the circle, i.e. sends the n-fold loop to the -n-fold loop.
 
 ```agda
 invert : S1 → S1
-invert = {!!}
+invert = S1-rec base (! loop)
 ```
 
 # Circles equivalence
@@ -65,7 +83,7 @@ is homotopic to the identity on base and loop:
 
 ```agda
 to-from-base : from (to base) ≡ base
-to-from-base = {!!}
+to-from-base = refl _
 ```
 
 (⋆⋆⋆) 
@@ -93,14 +111,24 @@ paths in product types compose (⋆⋆⋆):
 compose-pair≡ : {A B : Type} {x1 x2 x3 : A} {y1 y2 y3 : B}
                 (p12 : x1 ≡ x2) (p23 : x2 ≡ x3)
                 (q12 : y1 ≡ y2) (q23 : y2 ≡ y3)
-              → ((pair≡ p12 q12) ∙ (pair≡ p23 q23)) ≡ {!!} [ (x1 , y1) ≡ (x3 , y3) [ A × B ] ]
-compose-pair≡ = {!!}
+              → ((pair≡ p12 q12) ∙ (pair≡ p23 q23)) ≡ pair≡ (p12 ∙ p23) (q12 ∙ q23) [ (x1 , y1) ≡ (x3 , y3) [ A × B ] ]
+compose-pair≡ (refl _) (refl _) (refl _) (refl _) = refl _
 ```
 
 (🌶️)
 ```
 torus-to-circles : Torus → S1 × S1
-torus-to-circles = {!!}
+torus-to-circles =
+ T-rec
+  (base , base)
+  (pair≡ (refl _) loop)
+  (pair≡ loop (refl _))
+  (
+    (compose-pair≡ (refl _) loop loop (refl _)) ∙
+    (ap (λ rl → pair≡ rl loop) (∙unit-l loop)) ∙
+    ! (ap (λ rl → pair≡ loop rl) (∙unit-l loop)) ∙
+    ! (compose-pair≡ loop (refl _) (refl _) loop)
+  )
 ```
 
 # Suspensions (🌶️)
@@ -111,11 +139,11 @@ equivalence (functions back and forth), since we haven't seen how to
 prove that such functions are inverse yet.
 
 ```agda
-c2s : Circle2 → Susp {!!}
-c2s = {!!}
+c2s : Circle2 → Susp Bool
+c2s = Circle2-rec northS southS (merid true) (merid false)
 
-s2c : Susp {!!} → Circle2
-s2c = {!!}
+s2c : Susp Bool → Circle2
+s2c = Susp-rec north south (if_then west else east)
 ```
 
 Suspension is a functor from types, which means that it acts on
@@ -123,7 +151,7 @@ functions as well as types.  Define the action of Susp on functions:
 
 ```agda
 susp-func : {X Y : Type} → (f : X → Y) → Susp X → Susp Y
-susp-func f = {!!} 
+susp-func f = Susp-rec northS southS   (merid ∘ f)
 ```
 
 To really prove that Susp is a functor, we should check that this action
@@ -141,12 +169,12 @@ inverse yet.
 
 ```agda
 SuspFromPush : Type → Type
-SuspFromPush A = {!!}
+SuspFromPush A = Pushout A 𝟙 𝟙 (λ _ → ⋆) (λ _ → ⋆)
 
 s2p : (A : Type) → Susp A → SuspFromPush A
-s2p A = {!!}
+s2p A = Susp-rec (inl ⋆) (inr ⋆) glue
 
 p2s : (A : Type) → SuspFromPush A → Susp A
-p2s A = {!!}
+p2s A = Push-rec (λ { ⋆ → northS }) (λ { ⋆ → southS }) merid
 ```
 
