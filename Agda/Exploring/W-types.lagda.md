@@ -3,7 +3,7 @@
 
 module W-types where
 
-open import new-prelude
+open import copied-prelude
 
 ```
 We'll define $W$-types with the using the syntax `_◂_` instead of `sup` for convenience.

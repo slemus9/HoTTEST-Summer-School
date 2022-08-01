@@ -9,7 +9,7 @@ this soon.
 
 {-# OPTIONS --without-K #-}
 
-module new-prelude where
+module copied-prelude where
 
 open import Agda.Primitive using (Level; lzero; lsuc; _⊔_) renaming (Set to Type) public
 
