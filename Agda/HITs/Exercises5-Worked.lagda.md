@@ -82,7 +82,7 @@ PathOver-path≡ {A}{B}{g}{f}{a}{a}{refl _}{q}{r} h =
   path-to-pathover (h ∙ (∙unit-l _))
 
 circles-to-torus : S1 → (S1 → Torus)
-circles-to-torus = {!!}
+circles-to-torus = S1-elim {!   !} {!   !} {!   !}
 
 circles-to-torus' : S1 × S1 → Torus
 circles-to-torus' (x , y) = circles-to-torus x y
@@ -105,7 +105,7 @@ multiplication.
 (⋆) Show that base is a left unit.
 ```agda
 mult-unit-l : (y : S1) → mult base y ≡ y
-mult-unit-l y = {!!}
+mult-unit-l y = refl _
 ```
 
 (⋆) Because we'll need it in a second, show that ap distributes over
@@ -116,7 +116,7 @@ ap-∘ : ∀ {l1 l2 l3 : Level} {A : Type l1} {B : Type l2} {C : Type l3}
        {a a' : A}
        (p : a ≡ a')
      → ap (g ∘ f) p ≡ ap g (ap f p)
-ap-∘ = {!!}
+ap-∘ f g (refl _) = refl _
 ```
 
 (⋆⋆) Suppose we have a curried function f : S1 → A → B.  Under the
