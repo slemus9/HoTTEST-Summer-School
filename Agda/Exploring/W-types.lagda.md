@@ -102,6 +102,8 @@ four₂ᵂ = addᵂ one three
 eq4ᵂ : four₁ᵂ ≡ four₂ᵂ
 eq4ᵂ = refl _
 ```
+[*Is the following section showing anything interesting? Keep?*]
+
 Do we get the same thing if we use our new natural number induction?
 ```agda
 add : ℕᵂ → ℕᵂ → ℕᵂ
@@ -186,7 +188,7 @@ inverse (bijectivity ℕ≅ℕᵂ) = g
 ```
 Yay!
 
-[*To do: implement the remainder of the paper*]
+[*To do: implement the remainder of the paper; break up into sections*]
 
 
 
