@@ -13,6 +13,12 @@ open import Lecture5-notes
 ```
 The first idea here is that one definition of the integers is just...the naturals. It all depends on how you work with them! If your operations treat them as the integers, they may as well be the integers.
 ```agda
+data ℕ : Type where
+ zero : ℕ
+ suc  : ℕ → ℕ
+
+{-# BUILTIN NATURAL ℕ #-}
+
 data ℤ : Type where
  zero : ℤ
  next : ℤ → ℤ
@@ -40,6 +46,11 @@ sign (next zero) = [-]
 sign (next (next zero)) = [+]
 sign (next (next (next n))) = sign (next n)
 
+absℤ : ℤ → ℕ
+absℤ zero = 0
+absℤ (next zero) = suc 0
+absℤ (next (next n)) = suc (absℤ n)
+
 unnext : ℤ → ℤ
 unnext zero = zero
 unnext (next n) = n
@@ -49,6 +60,24 @@ sucℤ n with sign n
 ...         | [0] = next (next zero)
 ...         | [+] = next (next n)
 ...         | [-] = unnext (unnext n)
+
+preℤ : ℤ → ℤ
+preℤ n with sign n
+...         | [0] = (next zero)
+...         | [+] = unnext (unnext n)
+...         | [-] = next (next n)
+
+
+
+_∘^_ : {X : Type} → (X → X) → ℕ → (X → X)
+f ∘^ 0 = id
+f ∘^ (suc n) = λ x → (f ∘^ n) (f x)
+
+addℤ : ℤ → ℤ → ℤ
+addℤ n with sign n
+...         | [0] = id
+...         | [+] = sucℤ ∘^ (absℤ n)
+...         | [-] = preℤ ∘^ (absℤ n)
 ```
 Let's make another $\mathbb{Z}$. One drawback, computationally, is that to know whether an integer is positive or negative, we have to totally deconstruct it.
 
@@ -258,7 +287,9 @@ postulate
            (path : tree [ b₀ ] (base b₀) b₀ ≡ base b₀ [ P ↓ mseg ]) →
            apd (Bℕ-elim P base tree path) mseg ≡ path
 ```
-Now it's time to show an equivalence!
+Now it's time to show an equivalence! [Eventually.]
+
+Let's define an essentially similar binary implementation of the integers. We'll through a "negate" operation into the mix: ⊟.
 
            
 
