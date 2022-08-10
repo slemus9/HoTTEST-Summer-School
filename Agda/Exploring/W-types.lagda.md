@@ -187,6 +187,26 @@ inverse (bijectivity ℕ≅ℕᵂ) = g
   eps (𝟏 ◂ f , c) = ap sucᵂ (eps (f ⋆ , c))
 ```
 Yay!
+```agda
+data bottomlessℕ : Type where
+ suc? : bottomlessℕ → bottomlessℕ
+
+data ℤ : Type where
+ zero : ℤ
+ next : ℤ → ℤ
+
+data Sign : Type where
+ [0] [-] [+] : Sign
+
+sign : ℤ → Sign
+sign zero = [0]
+sign (next zero) = [-]
+sign (next (next zero)) = [+]
+sign (next (next (next n))) = sign (next n)
+
+sucℤ : ℤ → ℤ
+sucℤ = {!!}
+```
 
 [*To do: implement the remainder of the paper; break up into sections*]
 
@@ -195,3 +215,4 @@ Yay!
 
 
 
+ 
