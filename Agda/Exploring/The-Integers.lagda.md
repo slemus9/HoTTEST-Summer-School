@@ -45,7 +45,7 @@ unnext zero = zero
 unnext (next n) = n
 
 sucℤ : ℤ → ℤ
-sucℤ n = with sign n
+sucℤ n with sign n
 ...         | [0] = next (next zero)
 ...         | [+] = next (next n)
 ...         | [-] = unnext (unnext n)
