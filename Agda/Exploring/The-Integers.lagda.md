@@ -40,8 +40,15 @@ sign (next zero) = [-]
 sign (next (next zero)) = [+]
 sign (next (next (next n))) = sign (next n)
 
+unnext : ℤ → ℤ
+unnext zero = zero
+unnext (next n) = n
+
 sucℤ : ℤ → ℤ
-sucℤ = {!!}
+sucℤ n = with sign n
+...         | [0] = next (next zero)
+...         | [+] = next (next n)
+...         | [-] = unnext (unnext n)
 ```
 Let's make another $\mathbb{Z}$. One drawback, computationally, is that to know whether an integer is positive or negative, we have to totally deconstruct it.
 
