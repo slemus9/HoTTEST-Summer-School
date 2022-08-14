@@ -250,8 +250,6 @@ sucbℤ (⊟ n) = negbℤ (bℤ-<bℕ (prebℕ⁺ n))
 
 So what if we added 0, and allowed either of the digits to be the "first" digit? Well, we'd need to establish a way to "collapse" a string of zeros down to zero...which is 
 ```agda
-
-
 postulate
  Bℕ : Type
  [_] : B₂ → Bℕ
@@ -289,8 +287,52 @@ postulate
 ```
 Now it's time to show an equivalence! [Eventually.]
 
+Now that we have the naturals (again), we can use many of the existing ways to turn the naturals into the integers. But what about doing it "natively"?
+
 Let's define an essentially similar binary implementation of the integers. We'll through a "negate" operation into the mix: ⊟.
 
+You might be saying, "this is unnecessarily complicated." And you're right! But we will do it anyway.
+
+We also ideally want to define "the kind of thing that can have an inversion action performed on it."
+```agda
+{-
+postulate
+ Bℤ : Type
+ [_] : B₂ → Bℤ
+ _▸_ : B₂ → Bℤ → Bℤ
+ ⊟   : Bℤ → Bℤ
+ mseg : b₀ ▸ [ b₀ ] ≡ [ b₀ ] -- accounts for all other equalities via ap
+ Bℕ-elim : (P : Bℕ → Type) →
+           (base : (b : B₂) → P [ b ])
+           (tree : (n : Bℕ) → P n → (b : B₂) → P (b ▸ n))
+           (path : tree [ b₀ ] (base b₀) b₀ ≡ base b₀ [ P ↓ mseg ]) →
+           ((n : Bℕ) → P n)
+
+ Bℕ-comp-[] : (P : Bℕ → Type) →
+           (base : (b : B₂) → P [ b ])
+           (tree : (n : Bℕ) → P n → (b : B₂) → P (b ▸ n))
+           (path : tree [ b₀ ] (base b₀) b₀ ≡ base b₀ [ P ↓ mseg ]) →
+           ((b : B₂) → Bℕ-elim P base tree path [ b ] ≡ base b)
+      
+ Bℕ-comp-▸ : (P : Bℕ → Type) →
+           (base : (b : B₂) → P [ b ])
+           (tree : (n : Bℕ) → P n → (b : B₂) → P (b ▸ n))
+           (path : tree [ b₀ ] (base b₀) b₀ ≡ base b₀ [ P ↓ mseg ])
+           (n : Bℕ) (b : B₂) →
+            Bℕ-elim P base tree path (b ▸ n)
+             ≡ tree n (Bℕ-elim P base tree path n) b
+
+{-# REWRITE Bℕ-comp-[] #-}
+{-# REWRITE Bℕ-comp-▸  #-}
+
+postulate
+ Bℕ-comp-mseg : (P : Bℕ → Type) →
+           (base : (b : B₂) → P [ b ])
+           (tree : (n : Bℕ) → P n → (b : B₂) → P (b ▸ n))
+           (path : tree [ b₀ ] (base b₀) b₀ ≡ base b₀ [ P ↓ mseg ]) →
+           apd (Bℕ-elim P base tree path) mseg ≡ path
+-}
+```
            
 
 
