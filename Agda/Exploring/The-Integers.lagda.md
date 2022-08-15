@@ -1,3 +1,5 @@
+# 🏗 Under construction 🚧
+
 There are a bunch of cool definitions of the integers that take advantage of HoTT, such as defining them as the loop space of the circle; there are also a bunch of cool definitions that come about after formalizing algebra in agda, such as taking the integers to be the free group on one generator.
 
 We won't be exploring those here (yet). This is just a way to explore different "mechanistic" characterizations of the integers...and maybe a way to do something else. We'll see.

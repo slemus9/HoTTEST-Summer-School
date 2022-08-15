@@ -180,9 +180,9 @@ postulate
 ```agda
 postulate 
   Susp-elim : {l : Level} {A : Type} (P : Susp A → Type l)
-            → (n : {!!})
-            → (s : {!!})
-            → (m : {!!})
+            → (n : P northS)
+            → (s : P southS)
+            → (m : (a : A) → n ≡ s [ P ↓ (merid a)])
             → (x : Susp A) → P x
 ```
 

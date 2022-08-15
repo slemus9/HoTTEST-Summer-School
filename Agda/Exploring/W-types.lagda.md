@@ -8,7 +8,7 @@ open import binary-sums
 open import empty-type
 
 ```
-### 🏗 Under construction 🚧
+# 🏗 Under construction 🚧
 
 We'll define $W$-types with the using the syntax `_◂_` instead of `sup` for convenience. In the following, we follow the construction described in [*Why not W?*](https://jashug.github.io/papers/whynotw.pdf) by Jasper Hugunin.
 
@@ -189,7 +189,6 @@ inverse (bijectivity ℕ≅ℕᵂ) = g
 Yay!
 
 [*To do: implement the remainder of the paper; break up into sections*]
-
 
 
 
