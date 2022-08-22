@@ -186,6 +186,23 @@ out'' : ℤ' → ℤ'
 out'' n = ▻ (sign' n) (inc out'' (sign' n) (unwrap n))
 -}
 ```
+The inverse of `out` is surprisingly hard to define recursively with reference only to itself. Instead, let's define "move". It takes in a sign denoting the direction of the movement
+```agda
+move : Sign → ℤ' → ℤ'
+move [0] = id
+move _ n = {!!}
+{-
+move-inner : Sign → Sign → ℤ' → ℤ'
+move-inner dir sgn zero = ▻ dir zero
+move-inner dir sgn rl0@(_ zero) with dir * (sign' rl0)
+...                          | [0] = rl0
+...                          | [+] = ▻ (sign' rl0) rl0
+...                          | [-] = zero
+move-inner dir sgn rln@(rl1@ (rl2@ n)) = {!!}
+-}
+
+```
+
 Compare to the (outer) binary implementation of the naturals:
 ```agda
 data B₂ : Type where
@@ -256,23 +273,23 @@ postulate
  Bℕ : Type
  [_] : B₂ → Bℕ
  _▸_ : B₂ → Bℕ → Bℕ
- mseg : b₀ ▸ [ b₀ ] ≡ [ b₀ ] -- accounts for all other equalities via ap
+ mseg : (b : B₂) → b ▸ [ b₀ ] ≡ [ b ] -- accounts for all other equalities via ap
  Bℕ-elim : (P : Bℕ → Type) →
            (base : (b : B₂) → P [ b ])
            (tree : (n : Bℕ) → P n → (b : B₂) → P (b ▸ n))
-           (path : tree [ b₀ ] (base b₀) b₀ ≡ base b₀ [ P ↓ mseg ]) →
+           (path : (b : B₂) → tree [ b₀ ] (base b₀) b ≡ base b [ P ↓ (mseg b) ]) →
            ((n : Bℕ) → P n)
 
  Bℕ-comp-[] : (P : Bℕ → Type) →
            (base : (b : B₂) → P [ b ])
            (tree : (n : Bℕ) → P n → (b : B₂) → P (b ▸ n))
-           (path : tree [ b₀ ] (base b₀) b₀ ≡ base b₀ [ P ↓ mseg ]) →
+           (path : (b : B₂) → tree [ b₀ ] (base b₀) b ≡ base b [ P ↓ (mseg b) ]) →
            ((b : B₂) → Bℕ-elim P base tree path [ b ] ≡ base b)
       
  Bℕ-comp-▸ : (P : Bℕ → Type) →
            (base : (b : B₂) → P [ b ])
            (tree : (n : Bℕ) → P n → (b : B₂) → P (b ▸ n))
-           (path : tree [ b₀ ] (base b₀) b₀ ≡ base b₀ [ P ↓ mseg ])
+           (path : (b : B₂) → tree [ b₀ ] (base b₀) b ≡ base b [ P ↓ (mseg b) ])
            (n : Bℕ) (b : B₂) →
             Bℕ-elim P base tree path (b ▸ n)
              ≡ tree n (Bℕ-elim P base tree path n) b
@@ -284,8 +301,9 @@ postulate
  Bℕ-comp-mseg : (P : Bℕ → Type) →
            (base : (b : B₂) → P [ b ])
            (tree : (n : Bℕ) → P n → (b : B₂) → P (b ▸ n))
-           (path : tree [ b₀ ] (base b₀) b₀ ≡ base b₀ [ P ↓ mseg ]) →
-           apd (Bℕ-elim P base tree path) mseg ≡ path
+           (path : (b : B₂) → tree [ b₀ ] (base b₀) b ≡ base b [ P ↓ (mseg b) ]) →
+           (b : B₂) →
+           apd (Bℕ-elim P base tree path) (mseg b) ≡ path b
 ```
 Now it's time to show an equivalence! [Eventually.]
 
