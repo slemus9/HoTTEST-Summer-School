@@ -60,7 +60,7 @@ A contravariant functor would flip the arguments to $C$.
 
 We also have
 
-$$F(1_a) = 1_(F a)$$
+$$F(1_a) = 1_{F a}$$
 
 which is a law we'll leave unchanged.
 
@@ -128,7 +128,7 @@ On the other hand, the definition of functoriality seems very close to the defin
 
 Here's another idea: dualize the above construction with respect to function application. That is, if $f \in C(b,b')$, look at $\text{ev}_f : C(a,b) \times C(b',c) \to C(a,c)$.
 
-But staring at that, it occurs to me...remember how $\circ$ actually takes three object arguments, as $\circ_{a,b,c}$? $\text{ev}_f$ is basically replacing that middle $b$ with $f$. If we instead view the middle one as an arrow argument, then $f \circ_{a,-,c} g = C(g,f)$. Keeping the objects implicit, $f \circ (-) \circ g = C(g,f)$ Also, we can replace the outer two objects $a,c$ with arrows as well to get an operation that composes *five* arrows.
+But staring at that, it occurs to me...remember how $\circ$ actually takes three object arguments, as $\circ_{a,b,c}$? Well, $\text{ev}_f$ is basically replacing that middle $b$ with $f$. If we instead view the middle one as an arrow argument, then $f \circ_{a,-,c} g = C(g,f)$. Keeping the objects implicit, $f \circ (-) \circ g = C(g,f)$ Also, we can replace the outer two objects $a,c$ with arrows as well to get an operation that composes *five* arrows.
 
 Wait, what?! Why would we want that? Well...we don't, but it does show something interesting: that even the most fundamental operations can accommodate this kind of "level-jumping" where we're able to turn objects into arrows. The fact that $\circ_{a,-,c}$ turns into $\circ (-) \circ$ is also interesting.
 

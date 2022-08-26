@@ -198,7 +198,7 @@ move-inner dir sgn rl0@(_ zero) with dir * (sign' rl0)
 ...                          | [0] = rl0
 ...                          | [+] = ▻ (sign' rl0) rl0
 ...                          | [-] = zero
-move-inner dir sgn rln@(rl1@ (rl2@ n)) = {!!}
+move-inner dir sgn rln@(rl1@ (rl2@ n)) = 
 -}
 
 ```
@@ -277,13 +277,15 @@ postulate
  Bℕ-elim : (P : Bℕ → Type) →
            (base : (b : B₂) → P [ b ])
            (tree : (n : Bℕ) → P n → (b : B₂) → P (b ▸ n))
-           (path : (b : B₂) → tree [ b₀ ] (base b₀) b ≡ base b [ P ↓ (mseg b) ]) →
+           (path : (b : B₂) →
+            tree [ b₀ ] (base b₀) b ≡ base b [ P ↓ (mseg b) ]) →
            ((n : Bℕ) → P n)
 
  Bℕ-comp-[] : (P : Bℕ → Type) →
            (base : (b : B₂) → P [ b ])
            (tree : (n : Bℕ) → P n → (b : B₂) → P (b ▸ n))
-           (path : (b : B₂) → tree [ b₀ ] (base b₀) b ≡ base b [ P ↓ (mseg b) ]) →
+           (path : (b : B₂) →
+            tree [ b₀ ] (base b₀) b ≡ base b [ P ↓ (mseg b) ]) →
            ((b : B₂) → Bℕ-elim P base tree path [ b ] ≡ base b)
       
  Bℕ-comp-▸ : (P : Bℕ → Type) →
@@ -301,12 +303,95 @@ postulate
  Bℕ-comp-mseg : (P : Bℕ → Type) →
            (base : (b : B₂) → P [ b ])
            (tree : (n : Bℕ) → P n → (b : B₂) → P (b ▸ n))
-           (path : (b : B₂) → tree [ b₀ ] (base b₀) b ≡ base b [ P ↓ (mseg b) ]) →
+           (path : (b : B₂) →
+            tree [ b₀ ] (base b₀) b ≡ base b [ P ↓ (mseg b) ]) →
            (b : B₂) →
            apd (Bℕ-elim P base tree path) (mseg b) ≡ path b
 ```
-Now it's time to show an equivalence! [Eventually.]
+Now it's time to show an equivalence!
+```agda
+{- Didn't work; termination issues. Don't want to wade into Data.Nat.Induction right now, but eventually!
+extract : ℕ → ℕ → ℕ × B₂
+extract zero n = n , b₀
+extract (suc zero) n = n , b₁
+extract (suc (suc m)) n = extract m (suc n)
 
+divide-and-mod-2' : ℕ → ℕ × B₂
+divide-and-mod-2' n = extract n zero
+
+
+_[×]_ : {A B A' B' : Type} → (A → B) → (A' → B') → ((A × A') → (B × B'))
+(f [×] g) (a , a') = (f a , g a')
+
+divide-and-mod-2 : ℕ → ℕ × B₂
+divide-and-mod-2 zero = zero , b₀
+divide-and-mod-2 (suc zero) = zero , b₁
+divide-and-mod-2 (suc (suc n)) = (suc [×] id) (divide-and-mod-2 n)
+
+divide-2 : ℕ → ℕ
+divide-2 zero = zero
+divide-2 (suc zero) = zero
+divide-2 (suc (suc n)) = (suc (divide-2 n))
+
+mod-2 : ℕ → B₂
+mod-2 zero = b₀
+mod-2 (suc zero) = b₁
+mod-2 (suc (suc n)) = mod-2 n
+
+binarize : ℕ → Bℕ
+binarize zero = [ b₀ ]
+binarize (suc zero) = [ b₁ ]
+binarize (suc (suc m)) = (mod-2 m) ▸ (binarize (suc (divide-2 m)))
+
+
+data Listℕ : Set where
+ [] : Listℕ
+ _::_ : ℕ → Listℕ → Listℕ
+
+f : ℕ → Listℕ
+f =
+...    | zero = []
+...    | (suc (suc n)) = (suc (suc n)) :: f (suc (suc n))
+-}
+-- I'm starting to think I really shouldn't have gone for the aesthetic of having all elements be B₂ indexed. Maybe an element [•] representing 0 would have been fine...
+path-to-pathover-path : ∀ {A : Type} {B : Type}
+                 → {a a' : A} {x y : B}
+                 → (p : x ≡ y)
+                 → (basepath : a ≡ a')
+                 → x ≡ y [ (λ _ → B) ↓ basepath ]
+path-to-pathover-path {A} {B} {a} {a} {x} {x} (refl _) (refl _) = reflo
+
+
+Bℕ-rec : {A : Type} →
+         (base : (b : B₂) → A)
+           (tree : (n : Bℕ) → A → (b : B₂) → A)
+           (path : (b : B₂) →
+            tree [ b₀ ] (base b₀) b ≡ base b) →
+           ((n : Bℕ) → A)
+Bℕ-rec {A} base tree path = Bℕ-elim (λ _ → A) base tree 
+          (λ b → path-to-pathover-path (path b) (mseg b))
+
+
+sucBℕ : Bℕ → Bℕ
+sucBℕ = Bℕ-rec (λ { b₀ → [ b₁ ] ; b₁ → b₀ ▸ [ b₁ ] })
+               (λ n → λ rec → λ { b₀ → b₁ ▸ n ; b₁ → b₀ ▸ rec })
+               (λ { b₀ → mseg b₁ ; b₁ → refl _ })
+
+{-
+(λ { b₀ → (apd {!sucBℕ!} (mseg b₀)) ;
+                     b₁ → apd (λ _ → (b₀ ▸ [ b₁ ])) (mseg b₁) })
+                     -}
+
+_∘₁_∘₂_ : {A B C A' B' : Type} → (A → B → C) → (A' → A) → (B' → B) → (A' → B' → C)
+f ∘₁ g ∘₂ h = λ a → λ b → f (g a) (h b)
+
+_≻ : {A : Type} {a : A} {B : A → Type} → (A → A → B a) → (A → B a)
+(f ≻) x = f x x
+
+_∙↓∙_ : {A : Type} {B : A → Type} {x0 y0 z0 : A} {x : B x0} {y : B y0} {z : B z0} {p : x0 ≡ y0} {q : y0 ≡ z0} → x ≡ y [ B ↓ p ] → y ≡ z [ B ↓ q ] → x ≡ z [ B ↓ (_∙_ p q) ]
+_∙↓∙_ {A} {B} {x0} {z0} {z0} {x} {z} {z} {p} {refl _} p' reflo = p'
+
+```
 Now that we have the naturals (again), we can use many of the existing ways to turn the naturals into the integers. But what about doing it "natively"?
 
 Let's define an essentially similar binary implementation of the integers. We'll through a "negate" operation into the mix: ⊟.
@@ -341,10 +426,10 @@ postulate
            (n : Bℕ) (b : B₂) →
             Bℕ-elim P base tree path (b ▸ n)
              ≡ tree n (Bℕ-elim P base tree path n) b
-
-{-# REWRITE Bℕ-comp-[] #-}
-{-# REWRITE Bℕ-comp-▸  #-}
-
+-}
+--{-# REWRITE Bℕ-comp-[] #-}
+--{-# REWRITE Bℕ-comp-▸  #-}
+{-
 postulate
  Bℕ-comp-mseg : (P : Bℕ → Type) →
            (base : (b : B₂) → P [ b ])
@@ -353,7 +438,7 @@ postulate
            apd (Bℕ-elim P base tree path) mseg ≡ path
 -}
 ```
-           
+Here's another implementation using negation:
 
 
 
@@ -366,4 +451,7 @@ postulate
 
 
 
-  
+
+
+
+   
