@@ -9,7 +9,7 @@ module plecture1 where
 
 -- open import general-notation
 {-
-  Not all Types are also Sets
+  Not all Types are Sets
 -}
 Type = Set
 
@@ -24,7 +24,7 @@ idBool : Bool → Bool
 idBool x = x
 
 {-
-We can create holes for types and resolving them
+We can create holes for types and resolve them
 using C-c C-s (solve constraints)
 idBool' : Bool → Bool
 idBool' = λ (x : ?) → x
@@ -190,7 +190,7 @@ lh : {X : Type} (xs ys : List X)
    → length (xs ++ ys) ≣ length xs + length ys
 lh []        ys = ℕ-refl (length ys)
 {-
-  Agda does computation when we ask for the goal:
+  Agda performs computations when we ask for the goal:
   (unfolding of definitions)
 
   length ((x :: xs) ++ ys) ≣ length (x :: xs) + length ys
