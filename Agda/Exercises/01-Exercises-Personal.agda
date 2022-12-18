@@ -73,3 +73,105 @@ is-non-zero (suc _) = true
 
 filter-example : filter is-non-zero (4 :: 3 :: 0 :: 1 :: 0 :: []) ≡ 4 :: 3 :: 1 :: []
 filter-example = refl _ -- refl _ should fill the hole here
+
+-- Part II: The identity type of the Booleans (★/★★)
+
+-- Exercise 1 (★)
+
+_≣_ : Bool → Bool → Type
+true  ≣ true  = 𝟙
+false ≣ false = 𝟙
+_     ≣ _     = 𝟘
+
+-- Exercise 2 (★)
+
+Bool-refl : (b : Bool) → b ≣ b
+Bool-refl true  = ⋆
+Bool-refl false = ⋆
+
+-- Exercise 3 (★★)
+
+≡-to-≣ : (a b : Bool) → a ≡ b → a ≣ b
+≡-to-≣ true  _ (refl _) = ⋆
+≡-to-≣ false _ (refl _) = ⋆
+
+≣-to-≡ : (a b : Bool) → a ≣ b → a ≡ b
+≣-to-≡ true  true  ★ = refl true
+≣-to-≡ false false _ = refl false
+
+-- Part III: Proving in Agda (★★/★★★)
+
+not-is-involution : (b : Bool) → not (not b) ≡ b
+not-is-involution true  = refl true
+not-is-involution false = refl false
+
+-- Exercise 1 (★★)
+
+||-is-commutative : (a b : Bool) → a || b ≡ b || a
+||-is-commutative true  true  = refl true
+||-is-commutative true  false = refl true
+||-is-commutative false true  = refl true
+||-is-commutative false false = refl false
+
+-- Exercise 2 (★★)
+
+&&-is-commutative : (a b : Bool) → a && b ≡ b && a
+&&-is-commutative true  true  = refl true
+&&-is-commutative true  false = refl false
+&&-is-commutative false true  = refl false
+&&-is-commutative false false = refl false
+
+-- Exercise 3 (★★)
+
+&&-is-associative : (a b c : Bool) → a && (b && c) ≡ (a && b) && c
+&&-is-associative true  b c = refl (b && c) 
+&&-is-associative false b c = refl false
+
+{-
+  With the &&' definition we have to enumerate all possible cases
+-}
+&&'-is-associative : (a b c : Bool) → a &&' (b &&' c) ≡ (a &&' b) &&' c
+&&'-is-associative true true true = refl true
+&&'-is-associative true true false = refl false
+&&'-is-associative true false true = refl false
+&&'-is-associative true false false = refl false
+&&'-is-associative false true true = refl false
+&&'-is-associative false true false = refl false
+&&'-is-associative false false true = refl false
+&&'-is-associative false false false = refl false
+
+-- Exercise 4 (★★★)
+
+max-is-commutative : (n m : ℕ) → max n m ≡ max m n
+max-is-commutative zero    zero    = refl zero
+max-is-commutative zero    (suc m) = refl (suc m)
+max-is-commutative (suc n) zero    = refl (suc n)
+max-is-commutative (suc n) (suc m) = to-show
+ where
+  IH : max n m ≡ max m n      -- induction hypothesis
+  IH = max-is-commutative n m -- recursive call on smaller arguments
+  to-show : suc (max n m) ≡ suc (max m n)
+  to-show = ap suc IH         -- ap(ply) suc on both sides of the equation
+
+min-is-commutative : (n m : ℕ) → min n m ≡ min m n
+min-is-commutative zero zero = refl zero
+min-is-commutative zero (suc m) = refl zero
+min-is-commutative (suc n) zero = refl zero
+min-is-commutative (suc n) (suc m) = ap suc (min-is-commutative n m)
+
+-- Exercise 5 (★★★)
+
+0-right-neutral : (n : ℕ) → n ≡ n + 0
+0-right-neutral zero    = refl zero
+0-right-neutral (suc n) = ap suc (0-right-neutral n)
+
+-- Exercise 6 (★★★)
+
+map-id : {X : Type} (xs : List X) → map id xs ≡ xs
+map-id []        = refl []
+map-id (x :: xs) = ap (x ::_) (map-id xs)
+
+map-comp : {X Y Z : Type} (f : X → Y) (g : Y → Z)
+           (xs : List X) → map (g ∘ f) xs ≡ map g (map f xs)
+map-comp f g [] = refl []
+map-comp f g (x :: xs) = ap ((g ∘ f) x ::_) (map-comp f g xs)
